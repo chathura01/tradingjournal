@@ -54,7 +54,7 @@ function pairColor(v: string) {
   const m: Record<string, string> = {
     'EUR/USD': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
     'GBP/USD': 'bg-violet-500/20 text-violet-300 border-violet-500/30',
-    'GER40':   'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    'GER40': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
     'XAU/USD': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
@@ -62,18 +62,18 @@ function pairColor(v: string) {
 
 function dayStatusColor(v: string) {
   const m: Record<string, string> = {
-    'Trading Day':       'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    'High Impact News':  'bg-orange-500/20 text-orange-300 border-orange-500/30',
-    'US Bank Holiday':   'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    'Trading Day': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    'High Impact News': 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+    'US Bank Holiday': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
 }
 
 function killZoneColor(v: string) {
   const m: Record<string, string> = {
-    'London':   'bg-sky-500/20 text-sky-300 border-sky-500/30',            // light blue
+    'London': 'bg-sky-500/20 text-sky-300 border-sky-500/30',            // light blue
     'New York': 'bg-purple-500/20 text-purple-300 border-purple-500/30',   // purple
-    'Gap':      'bg-gray-500/20 text-gray-300 border-gray-500/30',         // ash
+    'Gap': 'bg-gray-500/20 text-gray-300 border-gray-500/30',         // ash
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
 }
@@ -92,16 +92,16 @@ function outcomeColor(v: string) {
 
 function tradeStatusColor(v: string) {
   const m: Record<string, string> = {
-    'Good Win':  'bg-green-500/20 text-green-300 border-green-500/30',     // green
-    'Good Loss': 'bg-rose-500/20 text-rose-300 border-rose-500/30',        // pinkish red
-    'Bad Win':   'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',  // yellow
-    'Bad Loss':  'bg-red-500/20 text-red-300 border-red-500/30',           // red
+    'Good Win': 'bg-green-500/20 text-green-300 border-green-500/30',      // green
+    'Good Loss': 'bg-orange-500/20 text-orange-300 border-orange-500/30',  // orange
+    'Bad Win': 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',    // yellow
+    'Bad Loss': 'bg-red-500/20 text-red-300 border-red-500/30',            // red
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
 }
 
 function tradeColor(v: string) {
-  if (v === 'Took')   return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
+  if (v === 'Took') return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30';
   if (v === 'Missed') return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
   return 'bg-gray-700 text-gray-300 border-gray-600';
 }
@@ -421,7 +421,7 @@ export default function JournalPage() {
                           <Badge label={trade.pair} colorClass={pairColor(trade.pair)} />
                         </td>
                         <td className="px-3 py-3 text-gray-300 whitespace-nowrap text-xs">
-                          {trade.date ? new Date(trade.date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric'}) : '–'}
+                          {trade.date ? new Date(trade.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '–'}
                         </td>
                         <td className="px-3 py-3">
                           <Badge label={trade.dayStatus} colorClass={dayStatusColor(trade.dayStatus)} />
@@ -558,7 +558,7 @@ function TradeFormUI({
           <label className={labelClass}>Pair *</label>
           <select value={form.pair} onChange={e => set('pair', e.target.value)} className={selectClass} required>
             <option value="">Select pair</option>
-            {['EUR/USD','GBP/USD','GER40','XAU/USD'].map(p => (
+            {['EUR/USD', 'GBP/USD', 'GER40', 'XAU/USD'].map(p => (
               <option key={p} value={p}>{p}</option>
             ))}
           </select>
@@ -581,7 +581,7 @@ function TradeFormUI({
           <label className={labelClass}>Day Status *</label>
           <select value={form.dayStatus} onChange={e => set('dayStatus', e.target.value)} className={selectClass} required>
             <option value="">Select status</option>
-            {['Trading Day','High Impact News','US Bank Holiday'].map(s => (
+            {['Trading Day', 'High Impact News', 'US Bank Holiday'].map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
@@ -592,7 +592,7 @@ function TradeFormUI({
           <label className={labelClass}>KillZone *</label>
           <select value={form.killZone} onChange={e => set('killZone', e.target.value)} className={selectClass} required>
             <option value="">Select zone</option>
-            {['London','New York','Gap'].map(z => (
+            {['London', 'New York', 'Gap'].map(z => (
               <option key={z} value={z}>{z}</option>
             ))}
           </select>

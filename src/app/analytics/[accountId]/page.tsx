@@ -26,7 +26,7 @@ interface Trade {
 
 const PIE_COLORS: Record<string, string> = {
   'Good Win': '#22c55e',    // Green
-  'Good Loss': '#f43f5e',   // Pinkish Red
+  'Good Loss': '#f97316',   // Orange
   'Bad Win': '#eab308',     // Yellow
   'Bad Loss': '#ef4444',    // Red
   'TP': '#10b981',
@@ -280,7 +280,7 @@ export default function AnalyticsPage() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-7 gap-2">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
                   <div key={d} className="text-center text-xs text-gray-500 font-medium py-2 uppercase tracking-wider">{d}</div>
@@ -292,10 +292,10 @@ export default function AnalyticsPage() {
                   const hasTrades = pnl !== undefined;
                   const isPositive = pnl > 0;
                   const isNegative = pnl < 0;
-                  
+
                   let bgClass = 'bg-gray-800/40 hover:bg-gray-700/40';
                   let textClass = 'text-gray-400';
-                  
+
                   if (hasTrades) {
                     if (isPositive) {
                       bgClass = 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20';
