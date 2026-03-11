@@ -13,6 +13,7 @@ interface Trade {
   _id: string;
   day: number;
   pair: string;
+  date: string;
   outcome: string;
   tradeStatus: string;
   pnl: number;
