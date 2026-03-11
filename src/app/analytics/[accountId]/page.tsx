@@ -54,6 +54,7 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [accountName, setAccountName] = useState('');
   const [initialBalance, setInitialBalance] = useState(0);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login');
@@ -144,6 +145,30 @@ export default function AnalyticsPage() {
   const pairData = Object.entries(pairBreakdown).map(([pair, data]) => ({
     pair, wins: data.wins, losses: data.losses
   }));
+
+  // Calendar calculations
+  const pnlByDate: Record<string, number> = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    const dateStr = t.date.split('T')[0];
+    pnlByDate[dateStr] = (pnlByDate[dateStr] || 0) + (t.pnl || 0);
+  });
+
+  const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
+
+  const calYear = calendarMonth.getFullYear();
+  const calMonth = calendarMonth.getMonth();
+  const daysInMonth = getDaysInMonth(calYear, calMonth);
+  const firstDay = getFirstDayOfMonth(calYear, calMonth);
+
+  const calDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const calBlanks = Array.from({ length: firstDay }, (_, i) => i);
+
+  const prevMonth = () => setCalendarMonth(new Date(calYear, calMonth - 1, 1));
+  const nextMonth = () => setCalendarMonth(new Date(calYear, calMonth + 1, 1));
+  // Today's Date String for Highlighting
+  const todayStr = new Date().toISOString().split('T')[0];
 
   const tooltipStyle = {
     backgroundColor: '#1f2937',
@@ -236,6 +261,73 @@ export default function AnalyticsPage() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+
+            {/* Daily PnL Calendar */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-md font-semibold text-white">Daily PnL Calendar</h3>
+                <div className="flex items-center gap-4 bg-gray-800 p-1 rounded-xl">
+                  <button onClick={prevMonth} className="p-1 px-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition">
+                    &larr; Prev
+                  </button>
+                  <span className="text-white font-medium text-sm w-32 text-center">
+                    {calendarMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                  </span>
+                  <button onClick={nextMonth} className="p-1 px-3 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition">
+                    Next &rarr;
+                  </button>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-7 gap-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+                  <div key={d} className="text-center text-xs text-gray-500 font-medium py-2 uppercase tracking-wider">{d}</div>
+                ))}
+                {calBlanks.map(b => <div key={`blank-${b}`} className="min-h-[80px] bg-gray-950/30 rounded-xl" />)}
+                {calDays.map(d => {
+                  const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                  const pnl = pnlByDate[dateStr];
+                  const hasTrades = pnl !== undefined;
+                  const isPositive = pnl > 0;
+                  const isNegative = pnl < 0;
+                  
+                  let bgClass = 'bg-gray-800/40 hover:bg-gray-700/40';
+                  let textClass = 'text-gray-400';
+                  
+                  if (hasTrades) {
+                    if (isPositive) {
+                      bgClass = 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/20';
+                      textClass = 'text-emerald-400';
+                    } else if (isNegative) {
+                      bgClass = 'bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20';
+                      textClass = 'text-rose-400';
+                    } else {
+                      bgClass = 'bg-gray-700 border border-gray-600 hover:bg-gray-600';
+                      textClass = 'text-gray-300';
+                    }
+                  }
+
+                  const isToday = dateStr === todayStr;
+
+                  return (
+                    <Link
+                      key={d}
+                      href={`/journal/${accountId}`}
+                      className={`min-h-[80px] rounded-xl p-2.5 flex flex-col justify-between transition-colors border border-transparent ${bgClass} ${isToday ? '!border-blue-500/50 shadow-[0_0_15px_-3px_rgba(59,130,246,0.3)]' : ''}`}
+                    >
+                      <span className={`text-xs font-semibold ${isToday ? 'text-blue-400' : 'text-gray-500'}`}>
+                        {d}
+                      </span>
+                      {hasTrades && (
+                        <span className={`text-sm font-bold tracking-tight text-right ${textClass}`}>
+                          {pnl > 0 ? '+' : ''}${pnl.toFixed(2)}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Pie Charts Row */}
