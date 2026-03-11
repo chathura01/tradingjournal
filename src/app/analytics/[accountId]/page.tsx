@@ -25,10 +25,10 @@ interface Trade {
 }
 
 const PIE_COLORS: Record<string, string> = {
-  'Good Win': '#10b981',
-  'Good Loss': '#0ea5e9',
-  'Bad Win': '#f59e0b',
-  'Bad Loss': '#f43f5e',
+  'Good Win': '#22c55e',    // Green
+  'Good Loss': '#f43f5e',   // Pinkish Red
+  'Bad Win': '#eab308',     // Yellow
+  'Bad Loss': '#ef4444',    // Red
   'TP': '#10b981',
   'SL': '#f43f5e',
   'Took': '#10b981',

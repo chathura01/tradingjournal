@@ -71,9 +71,9 @@ function dayStatusColor(v: string) {
 
 function killZoneColor(v: string) {
   const m: Record<string, string> = {
-    'London':   'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    'New York': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    'Gap':      'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+    'London':   'bg-sky-500/20 text-sky-300 border-sky-500/30',            // light blue
+    'New York': 'bg-purple-500/20 text-purple-300 border-purple-500/30',   // purple
+    'Gap':      'bg-gray-500/20 text-gray-300 border-gray-500/30',         // ash
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
 }
@@ -92,10 +92,10 @@ function outcomeColor(v: string) {
 
 function tradeStatusColor(v: string) {
   const m: Record<string, string> = {
-    'Good Win':  'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    'Good Loss': 'bg-sky-500/20 text-sky-300 border-sky-500/30',
-    'Bad Win':   'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    'Bad Loss':  'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    'Good Win':  'bg-green-500/20 text-green-300 border-green-500/30',     // green
+    'Good Loss': 'bg-rose-500/20 text-rose-300 border-rose-500/30',        // pinkish red
+    'Bad Win':   'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',  // yellow
+    'Bad Loss':  'bg-red-500/20 text-red-300 border-red-500/30',           // red
   };
   return m[v] || 'bg-gray-700 text-gray-300 border-gray-600';
 }
