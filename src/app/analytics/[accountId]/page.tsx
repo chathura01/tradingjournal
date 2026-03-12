@@ -223,6 +223,18 @@ export default function AnalyticsPage() {
 
   const monthlyData = Object.values(monthlyStats).sort((a, b) => b.dateValue.getTime() - a.dateValue.getTime());
 
+  // Balance Curve Ticks (2% of initial balance increments)
+  const chartStep = initialBalance * 0.02 || 1; // Fallback to 1 if initialBalance is 0
+  const balances = balanceCurve.map(b => b.balance);
+  const minB = Math.min(...balances);
+  const maxB = Math.max(...balances);
+  const startTick = Math.floor(minB / chartStep) * chartStep;
+  const endTick = Math.ceil(maxB / chartStep) * chartStep;
+  const balanceTicks = [];
+  for (let t = startTick; t <= endTick + (chartStep / 2); t += chartStep) {
+    balanceTicks.push(t);
+  }
+
   return (
     <>
       <Navbar />
@@ -288,7 +300,13 @@ export default function AnalyticsPage() {
                 <LineChart data={balanceCurve} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
                   <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 12, fill: '#6b7280' }} label={{ value: 'Day', position: 'insideBottom', offset: -2, fill: '#6b7280', fontSize: 11 }} />
-                  <YAxis stroke="#6b7280" tick={{ fontSize: 12, fill: '#6b7280' }} tickFormatter={v => `$${v.toLocaleString()}`} />
+                  <YAxis
+                    stroke="#6b7280"
+                    tick={{ fontSize: 12, fill: '#6b7280' }}
+                    tickFormatter={v => `$${v.toLocaleString()}`}
+                    domain={[balanceTicks[0], balanceTicks[balanceTicks.length - 1]]}
+                    ticks={balanceTicks}
+                  />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`$${Number(v).toFixed(2)}`, 'Balance'] as any} />
                   <Line
                     type="monotone"
