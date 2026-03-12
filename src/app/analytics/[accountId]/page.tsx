@@ -134,8 +134,6 @@ export default function AnalyticsPage() {
     { name: 'Missed', value: missedTrades },
   ].filter(d => d.value > 0);
 
-  // PnL per day bar
-  const pnlData = trades.map(t => ({ day: t.day, pnl: t.pnl || 0, pair: t.pair }));
 
   // Pair breakdown
   const pairBreakdown: Record<string, { wins: number; losses: number }> = {};
@@ -304,29 +302,6 @@ export default function AnalyticsPage() {
               </ResponsiveContainer>
             </div>
 
-            {/* PnL per Day */}
-            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
-              <h3 className="text-md font-semibold text-white mb-4">PnL per Day</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={pnlData} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
-                  <XAxis dataKey="day" stroke="#6b7280" tick={{ fontSize: 11, fill: '#6b7280' }} />
-                  <YAxis stroke="#6b7280" tick={{ fontSize: 11, fill: '#6b7280' }} tickFormatter={v => `$${v}`} />
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    itemStyle={{ color: '#ffffff' }}
-                    labelStyle={{ color: '#ffffff' }}
-                    cursor={{ fill: 'transparent' }}
-                    formatter={(v: any) => [`${Number(v) >= 0 ? '+' : ''}$${Number(v).toFixed(2)}`, 'PnL'] as any}
-                  />
-                  <Bar dataKey="pnl" radius={[4, 4, 0, 0]}>
-                    {pnlData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.pnl >= 0 ? '#10b981' : '#f43f5e'} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
 
             {/* Daily PnL Calendar */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 mb-6">
