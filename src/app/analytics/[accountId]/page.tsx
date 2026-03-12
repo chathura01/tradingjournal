@@ -56,6 +56,7 @@ export default function AnalyticsPage() {
   const [accountName, setAccountName] = useState('');
   const [initialBalance, setInitialBalance] = useState(0);
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [activeTab, setActiveTab] = useState<'overview' | 'monthly'>('overview');
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login');
@@ -179,6 +180,51 @@ export default function AnalyticsPage() {
     fontSize: '12px',
   };
 
+  // Monthly Stats calculations
+  const monthlyStats: Record<string, {
+    monthStr: string;
+    tradesCount: number;
+    wins: number;
+    losses: number;
+    pnl: number;
+    dateValue: Date;
+  }> = {};
+
+  trades.forEach(t => {
+    if (!t.date) return;
+    
+    // Check if the trade was taken (or had an outcome)
+    const isCompleted = t.outcome === 'TP' || t.outcome === 'SL';
+    if (t.trade !== 'Took' && !isCompleted) return;
+
+    const d = new Date(t.date);
+    const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    
+    if (!monthlyStats[monthKey]) {
+      const firstOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+      monthlyStats[monthKey] = {
+        monthStr: d.toLocaleString('default', { month: 'long', year: 'numeric' }),
+        tradesCount: 0,
+        wins: 0,
+        losses: 0,
+        pnl: 0,
+        dateValue: firstOfMonth,
+      };
+    }
+    
+    if (t.trade === 'Took') {
+      monthlyStats[monthKey].tradesCount++;
+    }
+    if (t.outcome === 'TP') {
+      monthlyStats[monthKey].wins++;
+    } else if (t.outcome === 'SL') {
+      monthlyStats[monthKey].losses++;
+    }
+    monthlyStats[monthKey].pnl += (t.pnl || 0);
+  });
+
+  const monthlyData = Object.values(monthlyStats).sort((a, b) => b.dateValue.getTime() - a.dateValue.getTime());
+
   return (
     <>
       <Navbar />
@@ -210,8 +256,26 @@ export default function AnalyticsPage() {
           </div>
         ) : (
           <>
-            {/* Stat Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+            {/* Tabs */}
+            <div className="flex items-center gap-2 mb-6 border-b border-gray-800 pb-px">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${activeTab === 'overview' ? 'border-purple-500 text-white' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'}`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('monthly')}
+                className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${activeTab === 'monthly' ? 'border-purple-500 text-white' : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'}`}
+              >
+                Monthly PnL
+              </button>
+            </div>
+
+            {activeTab === 'overview' ? (
+              <>
+                {/* Stat Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
               <StatCard label="Win Rate" value={`${winRate}%`} sub={`${wins}W / ${losses}L`} color={parseFloat(winRate) >= 50 ? 'text-emerald-400' : 'text-red-400'} />
               <StatCard label="Total PnL" value={`${totalPnl >= 0 ? '+' : ''}$${totalPnl.toFixed(2)}`} sub="from all trades" color={totalPnl >= 0 ? 'text-emerald-400' : 'text-red-400'} />
               <StatCard label="Current Balance" value={`$${currentBalance.toFixed(2)}`} color="text-white" />
@@ -403,6 +467,55 @@ export default function AnalyticsPage() {
                     <Bar dataKey="losses" fill="#f43f5e" radius={[4, 4, 0, 0]} name="Losses" />
                   </BarChart>
                 </ResponsiveContainer>
+              </div>
+            )}
+              </>
+            ) : (
+              <div className="space-y-4">
+                {monthlyData.length === 0 ? (
+                  <p className="text-gray-500 text-sm text-center py-8">No completed trades to display.</p>
+                ) : (
+                  monthlyData.map(m => {
+                    const completedCount = m.wins + m.losses;
+                    const winRate = completedCount > 0 ? ((m.wins / completedCount) * 100).toFixed(1) : '0.0';
+                    return (
+                      <div key={m.monthStr} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-gray-700 transition-colors">
+                        <div>
+                          <h3 className="text-lg font-bold text-white">{m.monthStr}</h3>
+                          <p className="text-sm text-gray-400 mt-1">{m.tradesCount} Trades Took</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8 w-full md:w-auto mt-4 md:mt-0">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-medium">Trades</p>
+                            <p className="text-xl font-bold text-white">{m.tradesCount}</p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-medium">Wins / Losses</p>
+                            <p className="text-xl font-bold text-white">
+                              <span className="text-emerald-400">{m.wins}W</span>
+                              <span className="text-gray-500 mx-1">/</span>
+                              <span className="text-rose-400">{m.losses}L</span>
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-medium">Win Rate</p>
+                            <p className={`text-xl font-bold ${parseFloat(winRate) >= 50 ? 'text-emerald-400' : 'text-red-400'}`}>{winRate}%</p>
+                          </div>
+                          
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1 font-medium">Monthly PnL</p>
+                            <p className={`text-xl font-bold ${m.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                              {m.pnl > 0 ? '+' : ''}${m.pnl.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             )}
           </>
